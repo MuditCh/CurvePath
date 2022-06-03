@@ -1,0 +1,31 @@
+import org.opensim.modeling.*;  
+model = Model();
+
+body = Body('body',1.0,Vec3(0),Inertia(0));
+body.attachGeometry(Sphere(0.1))
+model.addBody(body);
+joint = FreeJoint('joint',model.getGround(),body);
+coordx = joint.upd_coordinates(3);
+coordx.setName('x');
+coordy = joint.upd_coordinates(4);
+coordy.setName('y');
+model.addJoint(joint);
+actuator = CoordinateActuator('x');
+actuator.setName('actuator');
+model.addForce(actuator);
+controller = PrescribedController();
+controller.addActuator(actuator);
+controller.prescribeControlForActuator('actuator',Sine());
+model.addController(controller);
+act = CoordinateActuator('y');
+act.setName('act');
+model.addForce(act);
+controllery = PrescribedController();
+controllery.addActuator(act);
+controllery.prescribeControlForActuator('act',Sine());
+model.addController(controllery);
+model.finalizeConnections;
+model.print('pointmass.osim');
+model.setUseVisualizer(true);
+initState = model.initSystem();
+finalState = opensimSimulation.simulate(model,initState,1.5);
